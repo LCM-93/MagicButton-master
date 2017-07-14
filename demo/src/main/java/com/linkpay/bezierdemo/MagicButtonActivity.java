@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.lcm.magicbutton.MagicButton;
+
 public class MagicButtonActivity extends AppCompatActivity {
 
     private MagicButton magicButton;

@@ -4,22 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="vertical"
-    tools:context="com.linkpay.bezierdemo.MagicButtonActivity"
-    android:gravity="center">
+    tools:context="com.linkpay.bezierdemo.MagicButtonActivity">
 
-
-    <com.linkpay.bezierdemo.MagicButton
+    <com.lcm.magicbutton.MagicButton
         android:id="@+id/magicButton"
-        android:layout_width="80dp"
-        android:layout_height="30dp"
-        app:isChecked="true"
-        app:checkedColor="@color/colorPrimary"
-        app:unCheckedColor="@color/colorAccent"/>
+        android:layout_width="90dp"
+        android:layout_height="30dp" />
+
 
     <Button
         android:id="@+id/btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"/>
+        android:layout_marginTop="30dp" />
 </LinearLayout>

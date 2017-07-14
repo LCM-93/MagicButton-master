@@ -1,4 +1,4 @@
-package com.linkpay.bezierdemo;
+package com.lcm.magicbutton;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;

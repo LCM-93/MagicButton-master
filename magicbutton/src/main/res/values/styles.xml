@@ -1,0 +1,10 @@
+<resources>
+
+    <declare-styleable name="MagicButton">
+        <attr name="checkedColor" format="color" />
+        <attr name="unCheckedColor" format="color" />
+        <attr name="duration" format="float" />
+        <attr name="isChecked" format="boolean" />
+    </declare-styleable>
+
+</resources>

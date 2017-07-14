@@ -1,4 +1,4 @@
-package com.linkpay.bezierdemo;
+package com.lcm.magicbutton;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -66,25 +66,16 @@ public class MagicButton extends View {
         int n = a.getIndexCount();
         for (int i = 0; i < n; i++) {
             int attr = a.getIndex(i);
-            switch (attr) {
-                case R.styleable.MagicButton_checkedColor:
-                    checkedColor = a.getColor(attr, Color.GREEN);
-                    break;
-
-                case R.styleable.MagicButton_unCheckedColor:
-                    unCheckedColor = a.getColor(attr, Color.RED);
-                    break;
-
-                case R.styleable.MagicButton_duration:
-                    duration = (long) a.getFloat(attr, 400);
-                    break;
-
-                case R.styleable.MagicButton_isChecked:
-                    isChecked = a.getBoolean(attr, false);
-                    break;
+            if (attr == R.styleable.MagicButton_checkedColor) {
+                checkedColor = a.getColor(attr, Color.GREEN);
+            } else if (attr == R.styleable.MagicButton_unCheckedColor) {
+                unCheckedColor = a.getColor(attr, Color.RED);
+            } else if (attr == R.styleable.MagicButton_duration) {
+                duration = (long) a.getFloat(attr, 400);
+            } else if (attr == R.styleable.MagicButton_isChecked) {
+                isChecked = a.getBoolean(attr, false);
             }
         }
-
         initPaint();
     }
 
