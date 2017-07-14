@@ -12,7 +12,10 @@
     <com.linkpay.bezierdemo.MagicButton
         android:id="@+id/magicButton"
         android:layout_width="80dp"
-        android:layout_height="30dp" />
+        android:layout_height="30dp"
+        app:isChecked="true"
+        app:checkedColor="@color/colorPrimary"
+        app:unCheckedColor="@color/colorAccent"/>
 
     <Button
         android:id="@+id/btn"

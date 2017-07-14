@@ -1,8 +1,11 @@
 package com.linkpay.bezierdemo;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -39,22 +42,54 @@ public class MagicButton extends View {
     private boolean isChecked = false;
     private int checkedColor = Color.GREEN;
     private int unCheckedColor = Color.RED;
+    private long duration = 400;
 
     private int paintColor;
 
+
     public MagicButton(Context context) {
-        super(context);
+        this(context, null);
     }
 
     public MagicButton(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
+
+
+    }
+
+    public MagicButton(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        /**
+         * 获取自定义属性
+         */
+        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.MagicButton, defStyleAttr, 0);
+        int n = a.getIndexCount();
+        for (int i = 0; i < n; i++) {
+            int attr = a.getIndex(i);
+            switch (attr) {
+                case R.styleable.MagicButton_checkedColor:
+                    checkedColor = a.getColor(attr, Color.GREEN);
+                    break;
+
+                case R.styleable.MagicButton_unCheckedColor:
+                    unCheckedColor = a.getColor(attr, Color.RED);
+                    break;
+
+                case R.styleable.MagicButton_duration:
+                    duration = (long) a.getFloat(attr, 400);
+                    break;
+
+                case R.styleable.MagicButton_isChecked:
+                    isChecked = a.getBoolean(attr, false);
+                    break;
+            }
+        }
 
         initPaint();
     }
 
-
     private void initPaint() {
-        paintColor = unCheckedColor;
+        paintColor = isChecked ? checkedColor : unCheckedColor;
 
         rightCircular = new Circular();
         leftCircular = new Circular();
@@ -102,8 +137,8 @@ public class MagicButton extends View {
         }
 
 
-        rightCircular.setCenter(width / 2 - height / 2, 0, 0);
-        leftCircular.setCenter(-width / 2 + height / 2, 0, height / 2 - 4);
+        rightCircular.setCenter(width / 2 - height / 2, 0, isChecked ? height / 2 - 4 : 0);
+        leftCircular.setCenter(-width / 2 + height / 2, 0, isChecked ? 0 : height / 2 - 4);
 
         rightCircular.setHalfPoint((leftCircular.centerX + leftCircular.radius + rightCircular.centerX - rightCircular.radius) / 2, (leftCircular.centerY + rightCircular.centerY) / 2);
         leftCircular.setHalfPoint((leftCircular.centerX + leftCircular.radius + rightCircular.centerX - rightCircular.radius) / 2, (leftCircular.centerY + rightCircular.centerY) / 2);
@@ -130,11 +165,9 @@ public class MagicButton extends View {
         mainPaint.setColor(paintColor);
         //绘制小圆
         if (rightCircular.isNeedDraw())
-//            rightCircular.drawCircle(canvas,rightPaint);
             canvas.drawCircle(rightCircular.centerX, rightCircular.centerY, rightCircular.radius, mainPaint);
 
         if (leftCircular.isNeedDraw())
-//            leftCircular.drawCircle(canvas,leftPaint);
             canvas.drawCircle(leftCircular.centerX, leftCircular.centerY, leftCircular.radius, mainPaint);
 
 
@@ -267,11 +300,14 @@ public class MagicButton extends View {
 
                 rightCircular.setHalfPoint((leftCircular.centerX + leftCircular.radius + rightCircular.centerX - rightCircular.radius) / 2, (leftCircular.centerY + rightCircular.centerY) / 2);
                 leftCircular.setHalfPoint((leftCircular.centerX + leftCircular.radius + rightCircular.centerX - rightCircular.radius) / 2, (leftCircular.centerY + rightCircular.centerY) / 2);
-
-                if (curValue == 1) {
-                    isChecked = !isChecked;
-                }
                 postInvalidate();
+            }
+        });
+
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                isChecked = !isChecked;
             }
         });
 
@@ -284,8 +320,8 @@ public class MagicButton extends View {
             }
         });
 
-        colorAnimator.setDuration(400);
-        animator.setDuration(400);
+        colorAnimator.setDuration(duration);
+        animator.setDuration(duration);
 
         colorAnimator.start();
         animator.start();
