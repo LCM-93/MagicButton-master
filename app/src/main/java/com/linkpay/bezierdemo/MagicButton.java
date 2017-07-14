@@ -1,11 +1,13 @@
 package com.linkpay.bezierdemo;
 
+import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -21,20 +23,24 @@ import android.view.View;
 
 public class MagicButton extends View {
     private static final String TAG = "MagicButton";
-    private Paint rightPaint;
-    private Paint leftPaint;
-    private Paint bezierPaint;
+    private Paint linePaint;
+    private Paint mainPaint;
 
     private Circular rightCircular;  //右边的圆
     private Circular leftCircular;  //左边的圆
 
-    private boolean isOpen = false;
 
-    private int with;
+    private int width;
     private int height;
 
     private int centerX;
     private int centerY;
+
+    private boolean isChecked = false;
+    private int checkedColor = Color.GREEN;
+    private int unCheckedColor = Color.RED;
+
+    private int paintColor;
 
     public MagicButton(Context context) {
         super(context);
@@ -43,33 +49,26 @@ public class MagicButton extends View {
     public MagicButton(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
-        initView();
         initPaint();
     }
 
-    private void initView() {
-        with = 260;
-        height = 80;
-        rightCircular = new Circular();
-        leftCircular = new Circular();
-    }
 
     private void initPaint() {
-        rightPaint = new Paint();
-        leftPaint = new Paint();
-        bezierPaint = new Paint();
+        paintColor = unCheckedColor;
 
-        rightPaint.setColor(Color.RED);
-        rightPaint.setStyle(Paint.Style.FILL);
-        rightPaint.setAntiAlias(true);
+        rightCircular = new Circular();
+        leftCircular = new Circular();
 
-        leftPaint.setColor(Color.RED);
-        leftPaint.setStyle(Paint.Style.FILL);
-        leftPaint.setAntiAlias(true);
+        linePaint = new Paint();
+        mainPaint = new Paint();
 
-        bezierPaint.setColor(Color.RED);
-        bezierPaint.setStyle(Paint.Style.FILL);
-        bezierPaint.setAntiAlias(true);
+        mainPaint.setColor(paintColor);
+        mainPaint.setStyle(Paint.Style.FILL);
+        mainPaint.setAntiAlias(true);
+
+        linePaint.setColor(paintColor);
+        linePaint.setStyle(Paint.Style.FILL);
+        linePaint.setAntiAlias(true);
     }
 
 
@@ -86,15 +85,32 @@ public class MagicButton extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        rightCircular.setCenter(with / 2 - height / 2, 0, 0);
-        leftCircular.setCenter(-with / 2 + height / 2, 0, height / 2);
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+        if (widthMode == MeasureSpec.EXACTLY) {
+            width = widthSize;
+        } else {
+            width = 120;
+        }
+
+        if (heightMode == MeasureSpec.EXACTLY) {
+            height = heightSize;
+        } else {
+            height = 50;
+        }
+
+
+        rightCircular.setCenter(width / 2 - height / 2, 0, 0);
+        leftCircular.setCenter(-width / 2 + height / 2, 0, height / 2 - 4);
 
         rightCircular.setHalfPoint((leftCircular.centerX + leftCircular.radius + rightCircular.centerX - rightCircular.radius) / 2, (leftCircular.centerY + rightCircular.centerY) / 2);
         leftCircular.setHalfPoint((leftCircular.centerX + leftCircular.radius + rightCircular.centerX - rightCircular.radius) / 2, (leftCircular.centerY + rightCircular.centerY) / 2);
-        leftCircular.setMinRadius(height/14);
-        rightCircular.setMinRadius(height/14);
+        leftCircular.setMinRadius(height / 14);
+        rightCircular.setMinRadius(height / 14);
 
-        setMeasuredDimension(with, height);
+        setMeasuredDimension(width, height);
     }
 
 
@@ -102,24 +118,24 @@ public class MagicButton extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        canvas.drawColor(Color.GRAY);
-
+//        canvas.drawColor(Color.GRAY);
         //绘制辅助坐标系
-        drawCoordinateSystem(canvas);
-
+//        drawCoordinateSystem(canvas);
         canvas.translate(centerX, centerY);
 
+        //绘制背景
+        drawbgLine(canvas);
 
 
-        
+        mainPaint.setColor(paintColor);
         //绘制小圆
         if (rightCircular.isNeedDraw())
 //            rightCircular.drawCircle(canvas,rightPaint);
-            canvas.drawCircle(rightCircular.centerX, rightCircular.centerY, rightCircular.radius, rightPaint);
+            canvas.drawCircle(rightCircular.centerX, rightCircular.centerY, rightCircular.radius, mainPaint);
 
         if (leftCircular.isNeedDraw())
 //            leftCircular.drawCircle(canvas,leftPaint);
-            canvas.drawCircle(leftCircular.centerX, leftCircular.centerY, leftCircular.radius, leftPaint);
+            canvas.drawCircle(leftCircular.centerX, leftCircular.centerY, leftCircular.radius, mainPaint);
 
 
         //绘制圆中间的贝塞尔曲线
@@ -127,6 +143,48 @@ public class MagicButton extends View {
             drawBezier(canvas);
 
 
+    }
+
+    /**
+     * 绘制背景
+     *
+     * @param canvas
+     */
+    private void drawbgLine(Canvas canvas) {
+        Path path = new Path();
+
+        path.moveTo(-width / 2 + height / 2, height / 2);
+
+        RectF rectF = new RectF(-width / 2, -height / 2, -width / 2 + height, height / 2);
+        path.addArc(rectF, 90, 180);
+
+        path.lineTo(width / 2 - height / 2, -height / 2);
+
+        RectF rectF1 = new RectF(width / 2 - height, -height / 2, width / 2, height / 2);
+        path.addArc(rectF1, -90, 180);
+
+        path.lineTo(-width / 2 + height / 2, height / 2);
+
+
+        linePaint.setColor(paintColor);
+        canvas.drawPath(path, linePaint);
+
+
+        Path path1 = new Path();
+        path1.moveTo(-width / 2 + height / 2, height / 2 - 2);
+
+        RectF rectF2 = new RectF(-width / 2 + 2, -height / 2 + 2, -width / 2 + height - 2, height / 2 - 2);
+        path1.addArc(rectF2, 90, 180);
+
+        path1.lineTo(width / 2 - height / 2, -height / 2 + 2);
+
+        RectF rectF3 = new RectF(width / 2 - height + 2, -height / 2 + 2, width / 2 - 2, height / 2 - 2);
+        path1.addArc(rectF3, -90, 180);
+
+        path1.lineTo(-width / 2 + height / 2, height / 2 - 2);
+
+        linePaint.setColor(Color.WHITE);
+        canvas.drawPath(path1, linePaint);
     }
 
     /**
@@ -143,7 +201,7 @@ public class MagicButton extends View {
         path.quadTo((rightCircular.centerX + leftCircular.centerX) / 2, 0, leftCircular.bottomPointX, leftCircular.bottomPointY);
         path.close();
 
-        canvas.drawPath(path, bezierPaint);
+        canvas.drawPath(path, mainPaint);
     }
 
 
@@ -175,11 +233,12 @@ public class MagicButton extends View {
     }
 
 
+    /**
+     * 切换动画
+     */
     public void startAnimator() {
         ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
-
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-
             private float leftCenterX;
             private float rightCenterX;
             private float leftRadius;
@@ -189,18 +248,18 @@ public class MagicButton extends View {
             public void onAnimationUpdate(ValueAnimator animation) {
                 float curValue = (float) animation.getAnimatedValue();
 
-                if (!isOpen) {
-                    rightRadius = curValue * height / 2;
-                    leftRadius = (1 - curValue) * height / 2;
+                if (!isChecked) {
+                    rightRadius = curValue * (height / 2 - 4);
+                    leftRadius = (1 - curValue) * (height / 2 - 4);
 
-                    rightCenterX = (-with / 2 + height) + (with - height / 2 * 3) * curValue;
-                    leftCenterX = (-with / 2 + height / 2) + (height / 2) * curValue;
+                    rightCenterX = (-width / 2 + height) + (width - height / 2 * 3) * curValue;
+                    leftCenterX = (-width / 2 + height / 2) + (height / 2) * curValue;
                 } else {
-                    rightRadius = (1 - curValue) * height / 2;
-                    leftRadius = curValue * height / 2;
+                    rightRadius = (1 - curValue) * (height / 2 - 4);
+                    leftRadius = curValue * (height / 2 - 4);
 
-                    rightCenterX = (with / 2 - height / 2) - (height / 2) * curValue;
-                    leftCenterX = (with / 2 - height) - (with - height / 2 * 3) * curValue;
+                    rightCenterX = (width / 2 - height / 2) - (height / 2) * curValue;
+                    leftCenterX = (width / 2 - height) - (width - height / 2 * 3) * curValue;
                 }
 
                 rightCircular.setCenter(rightCenterX, 0, rightRadius);
@@ -210,14 +269,26 @@ public class MagicButton extends View {
                 leftCircular.setHalfPoint((leftCircular.centerX + leftCircular.radius + rightCircular.centerX - rightCircular.radius) / 2, (leftCircular.centerY + rightCircular.centerY) / 2);
 
                 if (curValue == 1) {
-                    isOpen = !isOpen;
+                    isChecked = !isChecked;
                 }
                 postInvalidate();
             }
         });
 
 
-        animator.setDuration(1000);
+        ValueAnimator colorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), isChecked ? checkedColor : unCheckedColor, isChecked ? unCheckedColor : checkedColor);
+        colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                paintColor = (int) animation.getAnimatedValue();
+            }
+        });
+
+        colorAnimator.setDuration(400);
+        animator.setDuration(400);
+
+        colorAnimator.start();
         animator.start();
+
     }
 }

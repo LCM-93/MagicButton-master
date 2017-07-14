@@ -5,16 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.linkpay.bezierdemo.MagicButtonActivity">
+    tools:context="com.linkpay.bezierdemo.MagicButtonActivity"
+    android:gravity="center">
 
 
     <com.linkpay.bezierdemo.MagicButton
         android:id="@+id/magicButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="80dp"
+        android:layout_height="30dp" />
 
     <Button
         android:id="@+id/btn"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"/>
 </LinearLayout>
