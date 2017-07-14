@@ -1,4 +1,4 @@
 # MagicButton-master
 使用贝塞尔曲线绘制的一个有趣的开关按钮
 
-![](http://om0qizim4.bkt.clouddn.com/magic_button_demo.gif)
+![demo](http://om0qizim4.bkt.clouddn.com/magic_button_demo.gif)
