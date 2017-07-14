@@ -14,13 +14,14 @@ import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 /**
  * ****************************************************************
  * Author: LCM
  * Date: 2017/7/13 下午8:22
- * Desc:
+ * Desc: 贝塞尔曲线绘制的一个有趣的开关
  * *****************************************************************
  */
 
@@ -39,13 +40,29 @@ public class MagicButton extends View {
     private int centerX;
     private int centerY;
 
+    private boolean isAnimatorStart = false;
+
     private boolean isChecked = false;
     private int checkedColor = Color.GREEN;
     private int unCheckedColor = Color.RED;
     private long duration = 400;
-
     private int paintColor;
 
+    private OnCheckChangeListenter onCheckChangeListenter;
+
+    public void setOnCheckChangeListenter(OnCheckChangeListenter onCheckChangeListenter) {
+        this.onCheckChangeListenter = onCheckChangeListenter;
+    }
+
+    public void setChecked(boolean checked) {
+        if (isChecked != checked) {
+            startAnimator();
+        }
+    }
+
+    public boolean isChecked() {
+        return isChecked;
+    }
 
     public MagicButton(Context context) {
         this(context, null);
@@ -53,8 +70,6 @@ public class MagicButton extends View {
 
     public MagicButton(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
-
-
     }
 
     public MagicButton(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -97,6 +112,15 @@ public class MagicButton extends View {
         linePaint.setAntiAlias(true);
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_UP:
+                startAnimator();
+                break;
+        }
+        return true;
+    }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -260,7 +284,7 @@ public class MagicButton extends View {
     /**
      * 切换动画
      */
-    public void startAnimator() {
+    private void startAnimator() {
         ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             private float leftCenterX;
@@ -299,6 +323,10 @@ public class MagicButton extends View {
             @Override
             public void onAnimationEnd(Animator animation) {
                 isChecked = !isChecked;
+                if (onCheckChangeListenter != null) {
+                    onCheckChangeListenter.onCheck(isChecked);
+                }
+                isAnimatorStart = false;
             }
         });
 
@@ -314,8 +342,11 @@ public class MagicButton extends View {
         colorAnimator.setDuration(duration);
         animator.setDuration(duration);
 
-        colorAnimator.start();
-        animator.start();
+        if (!isAnimatorStart) {
+            colorAnimator.start();
+            animator.start();
+            isAnimatorStart = true;
+        }
 
     }
 }
