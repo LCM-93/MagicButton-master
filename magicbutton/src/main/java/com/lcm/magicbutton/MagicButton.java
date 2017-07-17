@@ -185,12 +185,9 @@ public class MagicButton extends View {
         if (leftCircular.isNeedDraw())
             canvas.drawCircle(leftCircular.centerX, leftCircular.centerY, leftCircular.radius, mainPaint);
 
-
         //绘制圆中间的贝塞尔曲线
         if (rightCircular.isNeedDraw() && leftCircular.isNeedDraw())
             drawBezier(canvas);
-
-
     }
 
     /**
