@@ -4,6 +4,6 @@
 [晨鸣的博客--MagicButton](http://lichenming.com/MagicButton.html#more)
 
 
-![demo](http://om0qizim4.bkt.clouddn.com/magic_button_demo1.gif?imageView2/0/w/560)
+<img src="https://raw.githubusercontent.com/lichenming0516/MagicButton-master/master/img/magic_button_demo1.gif" width="260" align=center />
 
 
